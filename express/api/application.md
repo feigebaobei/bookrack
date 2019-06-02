@@ -1,0 +1,261 @@
+# Application
+
+[TOC]
+
+通常使用`app`表示express应用。使用`express()`方法实例化。
+
+```
+var express = require('express'),
+  app = express()
+app.get('', (req, res) => {
+  res.send('hello world')
+})
+app.listen(3000)
+```
+
+这个app对象有以下方法。
+
+- 路由的http请求。例子请查看[app.METHOD](http://expressjs.com/en/4x/api.html#app.METHOD)和[app.param](http://expressjs.com/en/4x/api.html#app.param).
+- 配置中间件。[app.route](http://expressjs.com/en/4x/api.html#app.route)
+- 渲染html视图。[app.render](http://expressjs.com/en/4x/api.html#app.render)
+- 注册模板引擎。[app.engine](http://expressjs.com/en/4x/api.html#app.engine)
+
+还可以设置一些应用的其它属性，更多信息可以查看[Application settings](http://expressjs.com/en/4x/api.html#app.settings.table)
+
+> express应用对象可以参考[request对象](<http://expressjs.com/en/4x/api.html#req>)和[response对象](<http://expressjs.com/en/4x/api.html#res>)作为`req.app`和`rea.app`。
+
+## Properties
+
+### app.locals
+
+app.locals的属性是应用程序的局部变量。
+
+```
+console.dir(app.locals.title) // 'my app'
+console.dir(app.locals.email) // me@myapp.com
+```
+
+app.locals属性在整个应用程序的生命周期内有效。[res.locals](<http://expressjs.com/en/4x/api.html#res.locals>)只在request的生命周期内有效。
+
+你可以取得应用中的模板渲染中的局部变量。为模板提供这个变量很有用，就像应用级的数据一样。使用`req.app.locals`（见[req.app](<http://expressjs.com/en/4x/api.html#req.app>)）可以中间件的得到局部变量。
+
+```
+app.locals.title = 'my app'
+app.locals.strftime = require('strftime')
+app.locals.email = 'my@myapp.com'
+```
+
+### app.mountpath
+
+app.mountpath可以包括一个或多个子应用程序的路径模式。
+
+> 子应用是一个express的实例。它可以控制一个路由上的请求。
+
+```
+var expres = require('express'),
+  app = express(),
+  admin = expres()
+admin.get('/', (req, res) => {
+  res.send('admin home page')
+})
+app.use('/admin', admin)
+```
+
+它的作用与req对象的`baseUrl`很像。建议不要使用要req.baseUrl代替url路径。
+
+若一个子应用挂载到多个路由路径上时，`app.mounthpath`会返回这些路由路径模式。以下是一个例子。
+
+```
+var admin = express()
+admin.get('/', (req, res) => {
+  console.log(admin.mountpath) // ['/adm*n', '/manager']
+  res.send('String')
+})
+var secret = express()
+secret.get('/', (req, res) => {
+  console.log(secret.mountpath) // /secr*t
+  res.send('String')
+})
+admin.use('/secr*t', secret)
+admin.use(['/adm*n', '/manager'], admin)
+```
+
+## Events
+
+### app.on('mount', callback(parent))
+
+当子应用挂载到父应用上时触发`mount`事件。此时这个父应用将传递给回调函数。
+
+> 子应用将不继承被设置的默认值。你必须在子应用中再设置一次。
+>
+> 继承的设置没有默认值。
+>
+> 更多信息请查看[Application settings](<http://expressjs.com/en/4x/api.html#app.settings.table>)
+
+```
+var admin = express()
+admin.on('mount', parent => {
+  console.log('admin mounted')
+  console.log(parent)
+})
+admin.get('/', (req, res) => {
+  res.send('admin home page')
+})
+app.use('/admin', admin)
+```
+
+## Methods
+
+### app.all(path, callback [, callback...])
+
+这个方法类似标准的[app.METHOD()](<http://expressjs.com/en/4x/api.html#app.METHOD>)方法，它可以接受所有动作的http请求。
+
+| 参数     | 说明                                                         | 默认值 |
+| -------- | ------------------------------------------------------------ | ------ |
+| path     | 当路由被匹配是触发相应的中间件函数。其可以是以下任一情况。- 一个string。 - 一个路径模式。 - 一个正则表达式 - 由以上三个情况组成的数组。[例子](<http://expressjs.com/en/4x/api.html#path-examples>) | '/'    |
+| callback | 回调函数可以做以下事：- 一个中间件方法。 - 一些中间件方法。 - 由方法组成的中间件数组。 - 以上三个情况的组合。你可以使用多个中间件方法。它们使用`next()`触发以后的中间件方法。可以使用这个原理为路由设置预处理条件。[中间件的例子](<http://expressjs.com/en/4x/api.html#middleware-callback-function-examples>) | None   |
+
+下面的中间件函数是当请求/secret路由的任一http请求参数都会执行。
+
+```
+app.all('/secret', function (req, res, next) {
+  console.log('Accessing the secret section ...')
+  next() // pass control to the next handler
+})
+```
+
+这个方法是一个非常有用逻辑一特殊的任一的配置项。如果你定义 下面的路由在顶部。它会匹配所有的请求路由，在验证、加载user时。为满足以上条件，我们可以使用预置任务。当执行`next()`时触发下一个方法。
+
+`app.all('*', requireAuthentication, loadUser)` <=> `app.all('*', requireAuthentication) app.all('*', loaduser)`
+
+另一个例子：全局白名单方法，这个例子与前一个很像。但是严格限制使用'/api'开头。
+
+`app.all('/api/*', requireAuthentication)`
+
+### app.delete(path, callback [, callback...])
+
+为指定的路由绑定delete请求触发指定的中间件（们）。更多信息请查看[routing guide](<http://expressjs.com/en/guide/routing.html>)
+
+参数说明
+
+| 参数     | 说明                   | 默认值 |
+| -------- | ---------------------- | ------ |
+| path     | 当路由被匹配是触发相应的中间件函数。其可以是以下任一情况。- 一个string。 - 一个路径模式。 - 一个正则表达式 - 由以上三个情况组成的数组。[例子](<http://expressjs.com/en/4x/api.html#path-examples>) | '/'    |
+| callback | 回调函数可以做以下事：- 一个中间件方法。 - 一些中间件方法。 - 由方法组成的中间件数组。 - 以上三个情况的组合。你可以使用多个中间件方法。它们使用`next()`触发以后的中间件方法。可以使用这个原理为路由设置预处理条件。[中间件的例子](<http://expressjs.com/en/4x/api.html#middleware-callback-function-examples>) | None   |
+
+```
+app.delete('/', (req, res) => {
+  res.send('delete home page')
+})
+```
+
+### app.disable(name)
+
+设置name的值为false。这个name是[app settings table](<http://expressjs.com/en/4x/api.html#app.settings.table>)里的一项。执行`app.set('foo', false)`与执行`app.disable('foo')`一样。
+
+`app.disable('trust proxy')` <=> `app.get('trust proxy')` 都是false.
+
+### app.disabled(name)
+
+当app setting table里的name值为false时返回true。`app.set('foo', true)`与`app.enable('foo')`作用一样。
+
+`app.enable('trust proxy')` <=> `app.disabled('trust proxy')` 都是fasle
+
+### app.enable(name)
+
+### app.enabled(name)
+
+### app.engine(ext, callback)
+
+为给定的ext文件使用指定的模板引擎。
+
+默认情况下，express根据文件扩展名请求。如你渲染'foo.pug'文件。express会在内部调用以下内容，并缓存require()在后续中提高性能。
+
+`app.engine('pug', require('pug').__express)`
+
+对于没有提供开箱即用的`__express`方法，或你想为不同的扩展名使用不同的模板引擎，可以使用它。
+
+下面的例子是为渲染ejs文件指定渲染引擎的。
+
+`app.engine('html', require('ejs').renderFile)`
+
+// 这段我不会。   这时，ejs提供了`.renderFile()`方法。
+
+一些模板引擎不遵从一些惯例。[consolidate.js](<https://github.com/tj/consolidate.js>)库映射node模板引擎到惯例。所以可以无缝对接express.
+
+```
+var engines = require('consolidate')
+app.engine('haml', engines.haml)
+app.engine('html', engines.hogan)
+```
+
+### app.get(name)
+
+返回app settings table里的name的值。
+
+```
+app.get('title')// undefined
+app.set('title', 'my site')
+app.get('title') // my site
+```
+
+### app.get(path, callback[, callback...])
+
+为指定路由路径使用指定的回调函数（们）。
+
+### app.listen(path, [callback])
+
+开发unix socket并监听给定的路径。这个方法与node 的 http.Server.listen() 作用一样。
+
+```
+var express = require('express')
+var app = express()
+app.listen('/tmp/sock')
+```
+
+### `app.listen([port[, host[, backlog]]][, callback])`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### app.use()
+
+#### app.use([path,] callback [, callback...])
+
+在指定的路径上绑定指定的中间件。当路由被匹配时执行这个中间件。
+
+##### Arguments
+
+| 参数     | 说明 | 默认值 |
+| -------- | ---- | ------ |
+| path     |      |        |
+| callback |      |        |
+
+
+
+##### Description
+
+##### Error-handling middleware
+
+##### Path examples
+
+##### Middleware callback function example
