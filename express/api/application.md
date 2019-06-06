@@ -215,17 +215,224 @@ app.listen('/tmp/sock')
 
 ### `app.listen([port[, host[, backlog]]][, callback])`
 
+为host/port绑定监听链接。这个方法与`http.Server.listen()`一致。  
+
+若省略port或为0,则系统会分配一个未使用的port。这个情况对于自动任务（如：测试）很有用。
+
+```
+var express = require('express'),
+  app = express()
+app.listen(3000)
+```
+
+这个`app`是由`express()`返回的。用来处理node的http服务的请求。它很容易提供http/https服务并使用相同的代码。
+
+```
+var express = require('express'),
+  https = require('https'),
+  http = require('http'),
+  app = express()
+http.createServer(app).listen(80)
+https.createServer(options, app).listen(443)
+```
+
+`app.listen()`方法返回一个`http.Server`对象。这种方式是一个惯例。
+
+```
+app.listen = function () {
+	var server = http.createServer(this)
+	return server.listen.apply(server, arguments)
+}
+```
+
+### app.METHOD(path, callback[, callback ...])
+
+路由是一个http请求，它的请求方式就是http请求方式。如GET,PUT,POST……，在路由里都是使用小写。因此结果为`app.get()`,`app.post()`……
+
+express支持的路由方式与http的路由方式一样，使用相同的名字。
+
+- checkout
+- copy
+- delete
+- get
+- head
+- lock
+- merge
+- mkactivity
+- mkcol
+- move
+- m-search
+- notify
+- options
+- patch
+- post
+- purge
+- put
+- report
+- search
+- subscribe
+- trace
+- unlock
+- unsubscribe
+
+虽然的很多方式，但常用的就那几个。
+
+要路由转换为无效JavaScript变量名称的方法，请使用括号表示法。 例如，app ['m-search']（'/'，函数....
+
+`app.all()`是作用于所有路由的。
+
+### app.param([name], callback)
+
+为路由添加一个路由参数的触发函数。参数中的name是parameter的name值或其数组。callback是回调方法。其参数依次是request, response, next middleware, 参数的value, 参数的name。
+
+若参数中的name是一个数组。callback会在每次被声明时执行。执行顺序是定义顺序。除最后一个中间件外每一个中间件都需要执行`next()`方法进入下一个中间件。
+
+下面是一个例子，当`:user`出现在路由路径中，你可以映射逻辑去提供`req.user`,或执行验证。
+
+```
+app.param('user', function (req, res, next, id) {
+  // try to get the user details from the User model and attach it to the request object
+  User.find(id, function (err, user) {
+    if (err) {
+      next(err)
+    } else if (user) {
+      req.user = user
+      next()
+    } else {
+      next(new Error('failed to load user'))
+    }
+  })
+})
+```
+
+参数回调函数是被声明在当地路由上，它不会继承app的路由。因此，只要app的路由中的有时监听的路由参数就会触发。
+
+所有的参数回调函数都会先于路由回调函数触发，只有在请求回馈周期内执行一次，即使这个参数可以匹配多个路由。下面是一个例子。
+
+```
+app.param('id', function (req, res, next, id) {
+  console.log('CALLED ONLY ONCE')
+  next()
+})
+
+app.get('/user/:id', function (req, res, next) {
+  console.log('although this matches')
+  next()
+})
+
+app.get('/user/:id', function (req, res) {
+  console.log('and this matches too')
+  res.end()
+})
+// On GET /user/42, the following is printed:
+// CALLED ONLY ONCE
+// although this matches
+// and this matches too
+```
+
+```js
+app.param(['id', 'page'], function (req, res, next, value) {
+  console.log('CALLED ONLY ONCE with', value)
+  next()
+})
+
+app.get('/user/:id/:page', function (req, res, next) {
+  console.log('although this matches')
+  next()
+})
+
+app.get('/user/:id/:page', function (req, res) {
+  console.log('and this matches too')
+  res.end()
+})
+// On GET /user/42/3, the following is printed:
+// CALLED ONLY ONCE with 42
+// CALLED ONLY ONCE with 3
+// although this matches
+// and this matches too
+```
+
+> 下面的内容在express v4.11.0后才可以使用。
+
+我不会。
+
+### app.path()
+
+返回一个相对于app的权威的路径。
+
+```
+var app = express()
+var blog = express()
+var blogAdmin = express()
+app.use('/blog', blog)
+blog.use('/admin', blogAdmin)
+console.dir(app.path()) // ''
+console.dir(blog.path()) // '/blog'
+console.dir(blogAdmin.path()) // '/blog/admin'
+```
+
+有时这个方法会得到非常复杂的path（string）.有比它更好的方法。可以使用`req.baseUrl`.
+
+### app.post(path, callback [, callback ...])
+
+### app.put(path, callback [, callback ...])
+
+### app.render(view, [locals], callback)
+
+返回一个被回调函数渲染后的html。它接受一个options参数（就是上面的locals）。它包括视图需要的局部变量。就像`res.render()`除了不能发送给客户端。
+
+> `app.render()`方法是一个非常有用的方法。其内部的`res.render()`方法使用了`app.render()`方法渲染视图。
+>
+> 局部变量`cache`是控制是否缓存视图的。若我想在开发时缓存视图需要设置为true,在生产环境下默认cache是true.
+
+```
+app.render('email', function (err, html) {
+  // ...
+})
+
+app.render('email', { name: 'Tobi' }, function (err, html) {
+  // ...
+})
+```
+
+### app.route(path)
+
+返回一个单独路由的实例，在其上可以使用http请求方式、中间件。使用`app.route()`可以避免路由名重复和拼写错误。
+
+```
+var app = express()
+
+app.route('/events')
+  .all(function (req, res, next) {
+    // runs for all HTTP verbs first
+    // think of it as route specific middleware!
+  })
+  .get(function (req, res, next) {
+    res.json({})
+  })
+  .post(function (req, res, next) {
+    // maybe add a new event...
+  })
+```
+
+### app.set(name, value)
+
+可以使用这个方法设置任意你需要使用的变量的值。
+
+`app.set('foo', true)` <=> `app.enable('foo')`
+
+`app.set('foo', false)` <=> `app.disable('foo')`
+
+检索值是使用`app.get()`
+
+```
+app.set('title', 'my site')
+app.get('title') // my site
+```
 
 
 
-
-
-
-
-
-
-
-
+### app.use([path,] callback [, callback ...])
 
 
 
