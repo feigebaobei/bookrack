@@ -436,6 +436,209 @@ app.get('title') // my site
 
 
 
+**说明**
+
+因为路由默认为`"/"`，所以应用程序的每个请求都会执行没有路由安装的中间件。下面的中间件会作用于每一个请求。
+
+```
+app.use(function (req, res, next) {
+	console.log('time: %d', Date.now())
+	next()
+})
+```
+
+> 子应用不会继承有默认值设置。所以你必须在子应用中设置值。
+>
+> 子应用会继承没有默认值的设置。
+
+因为中间件是依次执行的，所以其定义顺序很重要。
+
+```
+// 这个中间件不会被执行，因为它在定义路由前定义。
+app.use(function (req, res, next) {
+  res.send('hello world')
+})
+// 给路由绑定中间件
+app.get('/', function (req, res) {
+  res.send('welcome')
+})
+```
+
+#### 错误控制中间件
+
+错误中间件总是提供4个参数。（err, req, res, next）
+
+```
+app.use(function (err, req, res, next) {
+  console.log(err.stack)
+  res.status(500).send('Something broke')
+})
+```
+
+现在是一些简单的例子。
+
+##### 使用path
+
+```
+app.use('/abcd', (req, res, next) => {
+next()
+})
+```
+
+##### 使用path pattern
+
+```
+app.use('/abc?d', (req, res, next) => {
+	next()
+})
+app.use('/ab+cd', (req, res, next) => {
+	next()
+})
+app.use('/ab\*cd', (req, res, next) => {
+	next()
+})
+app.use('/a(bc)?d', (req, res, next) => {
+	next()
+})
+```
+
+##### 使用regular expression
+
+```
+app.use(/\/abc|\/xyz/, (req, res, next) => {
+	next()
+})
+```
+
+##### 使用Array
+
+```
+app.use(['/abcd', '/xyza', /\/lmn|\/pqr/], (req, res, next) => {
+	next()
+})
+```
+
+#### 中间件回调函数的例子
+
+下面是一些例子，以中间件作为app.use()/app.METHOD()/app.all()方法的回调函数。若然都是使用app.use()，对于app.use()/app.METHOD()/app.all()同样。
+
+##### 单个中间件
+
+```
+//
+app.use((req, res, next) => {
+	next()
+})
+//
+var router = express.Router()
+router.get('/', (req, res, next) => {
+	next()
+})
+//
+var subApp = express()
+subApp.get('/', (req, res, next) => {
+	next()
+})
+```
+
+##### 多个中间件
+
+```
+// 定义多个中间件在同一个路由上
+var r0 = express.Router()
+r0.get('/', (req, res, next) => {
+	next()
+})
+r1 = express.Router()
+r1.get('/', (req, res, next) => {
+	next()
+})
+app.use(r1, r2)
+```
+
+##### 中间件组成的数组
+
+```
+// 使用中间件组成的数组。你必须明确使用路由才可以使用这样的数组。
+var r0 = express.Router(),
+	r1 = express.Router()
+r0.get('/', (req, res, next) => {
+	next()
+})
+r1.get('/', (req, res, next) => {
+	next()
+})
+app.use('/', [r1, r2])
+```
+
+##### 多种形式组成的中间件序列
+
+```
+function mw0 (req, res, next) { next() }
+function mw1 (req, res, next) { next() }
+var r0 = express.Router(),
+	r1 = express.Router(),
+	subApp = express()
+r0.get('/', (req, res, next) => { next() })
+r1.get('/', (req, res, next) => { next() })
+subApp.get('/', (req, res, next) => { next() })
+app.use(mw0, [mw1, r0, r1], subApp)
+```
+
+下面是一个使用express.static中间件的例子。保存静态内容到‘public’目录。
+
+```
+// get style.css etc
+app.use(express.static(__dirname + '/public'))
+```
+
+在/static路由下挂载一个提供静态资源的中间件。当请求前缀为/static的路由是执行该中间件。
+
+```
+app.use('/static', express.static(__dirname + '/public'))
+```
+
+通过在静态中间件之后加载记录器中间件来禁用静态内容请求的日志记录。
+
+```
+app.use(express.static(__dirname + '/public'))
+app.use(logger())
+```
+
+使用多个静态资源时，后定义的会优先于先定义的。
+
+```
+app.use(express.static(__dirname + '/public'))
+app.use(express.static(__dirname + '/files'))
+app.use(express.static(__dirname + '/uploads'))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
