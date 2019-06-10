@@ -434,8 +434,6 @@ app.get('title') // my site
 
 ### app.use([path,] callback [, callback ...])
 
-
-
 **说明**
 
 因为路由默认为`"/"`，所以应用程序的每个请求都会执行没有路由安装的中间件。下面的中间件会作用于每一个请求。
@@ -613,59 +611,3 @@ app.use(express.static(__dirname + '/files'))
 app.use(express.static(__dirname + '/uploads'))
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### app.use()
-
-#### app.use([path,] callback [, callback...])
-
-在指定的路径上绑定指定的中间件。当路由被匹配时执行这个中间件。
-
-##### Arguments
-
-| 参数     | 说明 | 默认值 |
-| -------- | ---- | ------ |
-| path     |      |        |
-| callback |      |        |
-
-
-
-##### Description
-
-##### Error-handling middleware
-
-##### Path examples
-
-##### Middleware callback function example
