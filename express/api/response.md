@@ -231,10 +231,62 @@ res.status(500).jsonp({ error: 'message' })
 ```
 
 ### res.links(links)
+
+在返回头里添加links字段。
+
+```
+res.links({
+	next: 'http://api.example.com/users?page=2',
+	last: 'http://api.example.com/users?page=5'
+})
+```
+
 ### res.location(path)
+设置http头的location的path属性。
+
+```
+res.location('/foo/bar')
+```
+
 ### res.redirect([status,] path)
+
+重定向url到指定路由。使用与http相同的状态码的数字作为返回的状态码。状态码默认为302.
+
+```
+res.redirect('/foo/bar')// 使用相对根路径
+res.redirect(200, 'http://example.com')
+res.redirect('http://example.com') // 使用路径全拼
+res.redirect('foo/bar') // 相对当前路径
+res.redirect('..') // 返回上一级路由
+```
+
 ### res.render(view [, locals] [, callback])
+使用view渲染为html给客户端。
+
+- locals是渲染当前view模板需要的数据。
+- callback是回调函数。可以使用next()触发下一个函数。
+
+```
+res.render('index') // 使用相对view目录的文件。也可以使用绝对路径。
+res.render(__dirname + 'views/index')
+res.render('index', function (err, html) { // 使用回调函数
+	res.send(html)
+})
+res.render('index', {key: 'value'}, fn() {...}) // 为模板绑定数据
+```
+
 ### res.send([body])
+
+返回一个http返回。其主体可以是Buffer/String/Object/Array.
+
+```
+res.send(new Buffer('whoop'))
+res.send({ some: 'json' });
+res.send('<p>some html</p>');
+res.status(404).send('Sorry, we cannot find that!');
+res.status(500).send({ error: 'something blew up' });
+```
+
 ### res.sendFile(path [, options] [, fn])
 
 > 在v4.8.0后开始支持。
@@ -286,8 +338,54 @@ app.get('/file/:name', function (req, res, next) {
 更多信息请查看[send](<https://github.com/pillarjs/send>)
 
 ### res.sendStatus(statusCode)
+
+设置http返回状态码。
+
+```
+res.sendStatus(200)
+res.sendStatus(404)
+```
+
+若设置了一个不支持的状态码。则以这个状态码返回，并返回response body为该状态码。
+
 ### res.set(field [, value])
+
+设置返回头的字段及值。
+
+```
+res.set('Content-Type', 'text/plain')
+res.set({
+	'Content-Type': 'text/plain',
+	'Content-Length': '123',
+	'ETag': '12345'
+})
+```
+
 ### res.status(code)
+
+设置返回头的状态码。它可以链式调用。
+
+```
+res.status(403).end()
+res.status(400).send('Bad Request')
+res.status(404).sendFile('/absolute/path/to/404.png')
+```
+
 ### res.type(type)
+
+设置http头的Content-Type属性。使用[mime.lookup()](<https://github.com/broofa/node-mime#mimelookuppath>)结合指定的type作为最终的mime type.若出现'/'则直接设置为Content-Type.
+
+```
+res.type('.html') // 'text/html'
+res.type('html') // 'text/html'
+res.type('json') // 'application/json'
+res.type('application/json') // application/json
+res.type('png') // image/png
+```
+
 ### res.vary(field)
+
+若返回头里无vary，则在返回头里添加vary。
+
+`res.vary('User-Agent').render('docs')`
 
