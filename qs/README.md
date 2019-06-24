@@ -17,6 +17,17 @@ assert.equal(str, 'a=c');
 
 ### 解析对象
 
+`qs.parse(string, [options])`
+
+qs可以解析你使用方括号编写的对象的字符串。
+
+```
+qs.parse('foo[bar]=baz')
+{foo{bar: baz}}
+```
+
+
+
 ### 解析数组
 
 ### 字符串化
