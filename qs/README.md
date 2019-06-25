@@ -1,20 +1,19 @@
 # Introduction
 
+使用一些安全方法解析、字符串化查询字符串。
 
+## 使用
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+```
+var qs = require('qs');
+var assert = require('assert');
+ 
+var obj = qs.parse('a=c');
+assert.deepEqual(obj, { a: 'c' });
+ 
+var str = qs.stringify(obj);
+assert.equal(str, 'a=c');
+```
 
 ## 解析对象
 
@@ -43,8 +42,6 @@ qs.parse('foo[bar]=baz')
 | allowDots         | Boolean       | false  | 是否允许点设置属性。 |
 | charset           | String        |        |                      |
 | charsetSentinel   | Boolean       |        |                      |
-|                   |               |        |                      |
-|                   |               |        |                      |
 
 ## 解析数组
 
@@ -65,14 +62,6 @@ qs.parse('a[1]=b&a[0]=c') // {a: ['c', 'b']}
 | arrayLimit  | Number  | 20     | 允许解析的数据的长度。若有下标超出该设置、设置小于0的值、使用非number设置，则会解析为对象。 |
 | parseArrays | Boolean | true   | 是否解析为数组。                                             |
 | comma       | Boolean | false  | 是否允许使用逗号分隔数组数据。                               |
-|             |         |        |                                                              |
-|             |         |        |                                                              |
-|             |         |        |                                                              |
-|             |         |        |                                                              |
-|             |         |        |                                                              |
-|             |         |        |                                                              |
-|             |         |        |                                                              |
-|             |         |        |                                                              |
 
 下面是一个例子：
 
@@ -134,16 +123,6 @@ qs.stringify({a: null, b: undefined})
 | 属性               | 类型    | 默认值 | 说明                                                         |
 | ------------------ | ------- | ------ | ------------------------------------------------------------ |
 | strictNullHandling | Boolean | false  | 是否严格处理null。这个属性作用于parse、stringify。作用于parse时，若key对应的value为null时，则返回的key没有value。当作用于stringify时，若key后面没有value(key后面是分隔符)时，则解析为null. |
-|                    |         |        |                                                              |
-|                    |         |        |                                                              |
-|                    |         |        |                                                              |
-|                    |         |        |                                                              |
-|                    |         |        |                                                              |
-|                    |         |        |                                                              |
-|                    |         |        |                                                              |
-|                    |         |        |                                                              |
-|                    |         |        |                                                              |
-|                    |         |        |                                                              |
 
 ## 处理特殊的字符集
 
