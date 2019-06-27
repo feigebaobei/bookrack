@@ -29,5 +29,18 @@ Scoket连接可以指定不同的传输层协议（tcp 或 udp）。若使用tcp
 
 ## tcp
 
-TCP(Transmission Control Protocol 传输控制协议)是一种面向连接的、可靠的，基于字节流的传输层通信协议。
+TCP(Transmission Control Protocol 传输控制协议)是一种面向连接的、可靠的，基于字节流的传输层通信协议。  
+tcp有7层。每一层都会在前一层上添加头部信息。  
+
+    数据发送端       |         |         |         |         |   data  |
+                    |         |         |         |   ah    |   data  |
+                    |         |         |   ph    |   ah    |   data  |
+                    |         |   sh    |   ph    |   ah    |   data  |
+                    |   th    |   sh    |   ph    |   ah    |   data  |
+                    |         |   sh    |   ph    |   ah    |   data  |
+                    |         |         |   ph    |   ah    |   data  |
+                    |         |         |         |   ah    |   data  |
+    数据接收端       |         |         |         |         |   data  |
+
+## tcp头部
 
