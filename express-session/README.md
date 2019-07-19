@@ -8,11 +8,16 @@
 
 ## API
 
+session数据保存在server-side, cookie里保存session ID.  
+
 ### session(options)
 
 #### options
 
 ##### cookie
+
+default value `{path: '/', httpOnly: true, secure: false, maxAge: null}`
+
 ###### cookie.domain
 ###### cookie.expires
 ###### cookie.httpOnly
@@ -21,8 +26,19 @@
 ###### cookie.sameSite
 ###### cookie.secure
 ##### genid
+
+指定生成session id的方法。该方法若需要使用req参数，则req作为该方法的第一个参数。该方法默认使用[uid-safe](https://www.npmjs.com/package/uid-safe)库生成session id
+
 ##### name
+
+cookie中session id （作为value）的name（作为key）。即`req.cookies.name // get session id`
+
+default value is `connect.sid`
+
 ##### proxy
+
+设置安全cookie时信任返回代理。
+
 ##### resave
 ##### rolling
 ##### saveUninitialized
