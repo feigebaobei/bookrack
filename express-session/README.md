@@ -56,6 +56,9 @@ default value is `connect.sid`
 ##### secret
 ##### Required option
 ##### story
+
+指定session仓库。默认是memorystore实例。
+
 ##### unset
 #### req.session
 
