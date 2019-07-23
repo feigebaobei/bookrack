@@ -2,7 +2,7 @@
 
 在Express/Connect/Koa框架下可以保存session file。
 
-session-file-store就是session数据保存在session file里。
+session-file-store就是session数据保存在session file里。也就是session store(session仓库)
 
 ### 兼容
 
