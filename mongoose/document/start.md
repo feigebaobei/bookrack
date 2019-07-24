@@ -1,5 +1,14 @@
 # Quick Start
 
+这遍文章的内容
+
+1. 安装
+2. 连接数据库
+3. 定义schema（也为schema添加方法）
+4. 使用schema定义model
+5. 使用model创建实例。调用实例上的方法。
+6. 保存实例到mongodb
+
 ### 安装
 
 `npm i mongoose`
@@ -55,7 +64,7 @@ fluffy.speak()
 
 ### 保存数据
 
-save方法的参数是一个回调方法。其第一个参数是error.当出错是为真。
+以上的操作还没有保存到mongodb里，若要保存则需要save方法。save方法的参数是一个回调方法。其第一个参数是error.当出错是为真。
 
 ```
 fluffy.save((err, fluffy) => {
