@@ -55,6 +55,9 @@ default value is `connect.sid`
 
 ##### secret
 ##### Required option
+
+这个属性会被用于为cookie的session ID 签名。它可以是string / array of string。若为数组，则第一个元素用于签名。在验证请求时会考虑数组的全部元素。
+
 ##### story
 
 指定session仓库。默认是memorystore实例。
