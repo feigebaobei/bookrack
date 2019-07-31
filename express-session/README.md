@@ -54,7 +54,7 @@ default value is `connect.sid`
 当session是新的并未被修改时是未初始化。
 
 ##### secret
-##### Required option
+##### Required option  // 必选选项
 
 这个属性会被用于为cookie的session ID 签名。它可以是string / array of string。若为数组，则第一个元素用于签名。在验证请求时会考虑数组的全部元素。
 
