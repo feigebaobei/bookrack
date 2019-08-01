@@ -5,4 +5,5 @@
   * [资源管理](guide/asset.md)
 * [confusion](confusion/index.md)
   * [npm-package.json](confusion/npmPackage.md)
+  * [npx](confusion/npx.md)
 
