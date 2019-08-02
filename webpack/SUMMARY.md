@@ -10,4 +10,5 @@
     * [xml](confusion/xml.md)
 * [插件](plugin/index.md)
     * [htmlWebpackTemplate](plugin/htmlWebpackTemplate.md)
+    * [WebpackManifestPlugin](plugin/WebpackManifestPlugin.md)
 
