@@ -5,6 +5,7 @@
     * [资源管理](guide/asset.md)
     * [输出管理](guide/output.md)
     * [开发](guide/dev.md)
+    * [DevServer](guide/devServer.md)
 * [confusion](confusion/index.md)
     * [npm-package.json](confusion/npmPackage.md)
     * [npx](confusion/npx.md)
