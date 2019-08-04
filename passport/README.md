@@ -2,54 +2,49 @@
 
 [TOC]
 
-passport是为node.js设计的与express框架兼容的验证中间件。
-
-它是目的就是验证请求，它可以使用策略扩展。它不能挂载在路由上或数据模式（database schema）上。最大的灵活性，允许应用级设计。它的api很简单：你使用passport验证请求，passport会使用钩子函数在需要验证的地方，控制是否成功。
+这是兼容express框架的只做验证功能的中间件。它需要strategy（策略）扩展。它不挂载在路由上，不篡改数据库schema.让开发者最大化扩展主程序。它的api很简单：提供一个请求去验证，passport提供一个验证成功或失败的钩子函数。
 
 ## install
 
 `npm i passport`
 
-## 用法
-### 策略
+## usage
 
-passport使用策略的概念验证。策略可以验证username/password。也可以使用三方验证。（如facebook/twitter）或使用要OpenId同盟验证。
+### strategies
 
-在验证前你需要配置相应的策略。
+passport使用strategy验证请求。strategy可以验证username/password也可以使用OAuth也可以使用OpenID(开放验证).
+
+在验证前一定要配置。
 
 ```
 passport.use(new LocalStrategy(
-	function (username, password, done) {
-		User.findOne({username: username}, (err, user) => {
-			if (err) {return done(err)}
-			if (!user) {return done(null, false)}
-			if (!user.verifyPassword(password)) {return done(null, false)}
-			return done(null, user)
-		})
-	}
-))
+  function(username, password, done) {
+    User.findOne({ username: username }, function (err, user) {
+      if (err) { return done(err); }
+      if (!user) { return done(null, false); }
+      if (!user.verifyPassword(password)) { return done(null, false); }
+      return done(null, user);
+    });
+  }
+));
 ```
 
-在[passportjs.org](<http://www.passportjs.org/>)有300+种策略。
+现在已经有300+个strategy.
 
 ### sessions
 
-passport会维持login sessions。为了维持login sessions，验证开始时会序列化session。传给后续的请求时再反序列化。
+passport将维持持续登录session。为了让持续登录session正常工作,所以验证用户时必须序列化这个session，并且在后续请求中反序列化。
 
-passport不使用任何限制，你如何记录、保存user呢。你需要提供必要的serialization / deserialization 逻辑。在典型的应用中，你应该序列化user ID.在反序列化是使用该id找到user。
+passport不会影响你保存用户、记录数据。你需要执行必要的序列化方法和反序列化方法。下面是一种常见情况，它很简单的序列化user id，并在反序列化是找到这个id.
 
 ```
-passport.serializaUser((user, done) => {
-	done(null, user.id)
-})
-passport.deserializaUser((id, done) => {
-	User.findById(id, (err, user) => {done(err, user)})
-})
+passport.serializeUser((user, done) => {done(null, user.id)})
+passport.deserializeUser((id, done) => {User.findById(id, (err, user) => {done(err, user)})})
 ```
 
 ### middleware
 
-在express框架里使用passport时使用`passport.initialize()`方法配置中间件。若你保留session逻辑需要使用passport.session()。
+在express/connect框架的应用中使用passport需要先配置（`passport.initialize()`）。若你的应用使用持续登录session，则推荐但不必要使用`passport.session()`
 
 ```
 var app = express();
@@ -60,39 +55,29 @@ app.use(require('express-session')({ secret: 'keyboard cat', resave: true, saveU
 app.use(passport.initialize());
 app.use(passport.session());
 ```
-
-
-
 ### authenticate requests
 
-为路由添加验证时使用`passport.authenticate()`.
+passport提供了一个在路由里验证请求的方法`authenticate()`
 
 ```
 app.post('/login', passport.authenticate('local', {failureRedirect: '/login'}), (req, res) => {res.redirect('/')})
 ```
 
+## strategies
 
+passport有好多策略。下面是一些常用的策略。
 
-## 策略
+| 策略                   | 协议                      | 开发者 |
+| ---------------------- | ------------------------- | ------ |
+| Local                  | HTML form                 |        |
+| OpenID                 | OpenID                    |        |
+| BrowserID              | BrowserID                 |        |
+| Facebook               | OAuth 2.0                 |        |
+| Google                 | OpenID                    |        |
+| Google                 | OAuth/OAuth 2.0           |        |
+| Twitter                | OAuth                     |        |
+| Azure Active Directory | OAuth 2.0 / OpenID / SAML |        |
 
-passport的官网展示了300+策略。
+## examples
 
-## 搜索所有的策略
-
-| 策略                   | 协议                      | 开发者       |
-| ---------------------- | ------------------------- | ------------ |
-| Local                  | HTML form                 | Jared Hanson |
-| OpenID                 | OpenID                    | Jared Hanson |
-| BrowserID              | BrowserID                 | Jared Hanson |
-| Facebook               | OAuth 2.0                 | Jared Hanson |
-| Google                 | OpenID                    | Jared Hanson |
-| Google                 | OAuth / OAuth 2.0         | Jared Hanson |
-| Twitter                | OAuth                     | Jared Hanson |
-| Azure Active Directory | OAuth 2.0 / OpenID / SAML | Jared Hanson |
-
-
-
-## 例子
-## 测试
-## 信用
-## 支持者
+## related modules

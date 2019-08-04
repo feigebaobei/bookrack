@@ -5,6 +5,7 @@
 * [HTTP 缓存](./tutorials/cache.md)
 * [HTTP Cookie](./tutorials/cookie.md)
 * [HTTP 访问控制（CORS）](./tutorials/cors.md)
+* [Server-Side Access Control](./tutorials/accessControl.md)
 * [HTTP 的演变](./tutorials/evolution.md)
 * [web 安全引导](./tutorials/safe.md)
 * [HTTP 消息](./tutorials/message.md)

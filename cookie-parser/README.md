@@ -53,6 +53,12 @@ app.use(cookieParser())
 app.get('/', (req, res) => {
 	console.log('Cookies', req.cookies)
 	console.log('Signed Cookies: ', req.signedCookies)
+	// 设置
+	// res.cookie('k', 'v', {options})
+    // 得到
+    // req.cookies
+    // 删除
+    // res.clearCookie('cookieName')
 })
 app.listen(8080)
 ```
