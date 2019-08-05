@@ -14,7 +14,7 @@ passport需要使用策略去验证请求。策略包括验证username/password�
 
 在使用passport验证请求前必须为passport配置策略。
 
-策略与其配置需要使用`user()`方法提供。下面是的例子使用`LocalStrategy`(它是一种策略)去验证username/password。
+策略与其配置需要使用`user()`方法提供（即使用user()配置使用哪种验证策略）。下面是的例子使用`LocalStrategy`(它是一种策略)去验证username/password。
 
 ```
 var passport = require('passport')
@@ -35,6 +35,8 @@ passport.use(new LocalStrategy(
 ));
 ```
 
+new LocalStrategy()里的内容是passport-local的知识。
+
 ### verify callback
 
 上面的例子提到一个重要概念——验证回调。策略需要一个验证回调函数处理验证是否通过。（上面的例子在验证回调函数时做了查找是用户的username/password）
@@ -52,8 +54,10 @@ app.use(express.static('public'))
 app.use(session({secret: 'cats'}))
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(passport.initialize())
-app.use(session())
+app.use(passport.session())
 ````
+
+先使用session()再使用passport.session()。这样可以保存登录session.
 
 ### sessions
 
