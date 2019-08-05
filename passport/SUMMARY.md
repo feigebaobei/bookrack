@@ -6,6 +6,7 @@
   * [document](./official/doc/index.md)
     * [authenticate](./official/doc/authenticate.md)
     * [configure](./official/doc/config.md)
+    * [username&passwrod](./official/doc/up.md)
   * [feature](./official/feature.md)
   * [strategies](./official/strategies.md)
 
