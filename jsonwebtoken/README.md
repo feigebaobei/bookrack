@@ -52,10 +52,74 @@ options.header是自定义的。
 
 ## token的有效时间
 
+exp字段应该是一个从纪元时间开始的一个数值。
 
+下面是一个例子：
+    jwt.sign({
+        exp: Math.floor(Date.now() / 1000) + (60 * 60), // 1h
+        data: 'foobar'
+    }, 'secret')
+    
+    jwt.sign({
+        data: 'foobar'
+        }, 'secret', {expiresIn: 60 * 60}) // 1h
+    
+    jwt.sign({data: 'foobar'}, 'secret', {expiresIn: '1h'}) // 1h
+### jwt.verify(payload, secretOrPublicKey, [options, cb])
+若有cb则异步回调函数。该函数的参数是err/token。
+若没有cd则同步返回jwt。
+secretOrPublicKey 是解码的公钥。可以是string / buffer / 包含HMAC 算法。
+若jwt.verify是异步方法。secretOrPublicKey可以是一个返回公钥的方法。
+| 属性             | type            | describe                                       | default |
+| ---------------- | --------------- | ---------------------------------------------- | ------- |
+| algorithms       | Array           | 由算法的名字组成的数组。                       |         |
+| audience         | String / Regexp | 受众                                           |         |
+| complete         | Object          | 返回解码后的对象{payload, header, signature}   |         |
+| issuer           | string / Array  | iss 发布者                                     |         |
+| ignoreExpiration |                 | 是否忽略token里的终止期限。                    |         |
+| ignoreNotBefore  |                 |                                                |         |
+| subject          |                 | 主题                                           |         |
+| clockTolerance   | number          | 检查nbf / exp 时处理一些不范围与服务器的时间差 |         |
+| maxAge           | string / Number | 最大的有效时间                                 |         |
+| clockTimestamp   |                 | 使用当前时间                                   |         |
+| nonce            |                 | 一般用到Open ID                                |         |
+
+### jwt.decode(token[, options])
+
+同步返回解码后的payload.
+若不相信token是有效的,需要使用jwt.verify(...)
+
+|          |         |                                                      |      |
+| -------- | ------- | ---------------------------------------------------- | ---- |
+| json     |         | 若header里没有`"typ": "JWT"`，则强制使用`JSON.parse` |      |
+| complete | Boolean | 返回解码后的对象：{payload, header}                  |      |
 
 ## error对象
 
+jsonwebtoken定义了三个error对象
+TokenExpiredError // 当token超时时抛出。
+
+    err = {
+        name: 'TokenExpiredError',
+        massage: 'jwt expired',
+        expired: [ExpDate]
+    }
+
+JsonWebTokenError
+
+    err = {
+        name: 'JsonWebTokenError',
+        message: 'jwt malformed' // 'jwt malformed', 'jwt signature in required', 'invalid signature', 'jwt audience invalid. expected: [OPTIONS AUDIENCE]', 'jwt issuer invalid. expected: [OPTIONS ISSUER]', 'jwt id invalid. expected:[OPTIONS JWT ID]', 'jwt subject invalid. expected: [OPTIONS SUBJECT]'
+    }
+
+NotBeforeError
+当当前时间超过nbf的值时抛出该错误。
+
+    err = {
+        name: 'NotBeforeError',
+        message: 'jwt not active',
+        date: 2018-10-04T16:10:44.000Z
+    }
 ## 支持的加密算法
 
 ## 更新jwt
