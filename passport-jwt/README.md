@@ -33,7 +33,7 @@ options是一个包含了如何从req中取出token/验证token的各个设置�
 |                         |          |                                                              |                |
 | jwtFromRequest          | function | 接收req返回jwt / null。必选项。                              |                |
 | issuer                  |          | 若设置了issuer(iss)则验证。                                  |                |
-| audiencd                |          |                                                              |                |
+| audience                |          |                                                              |                |
 | algorithms              | Array    | 算法名称的列表。                                             |                |
 | ignoreExpiration        | Boolean  | true: 不验证token里的expireIn(exp)。                         |                |
 | passReqToCallback       | Boolean  | true: 把req做为验证回调函数的参数之一。如：`verify(req, jwt_payload, done_callback)` |                |
