@@ -44,7 +44,8 @@ options的属性及说明如下：
 
 有一些没有默认值的属性（expiresIn, notBefore, audience, subject, issuer）。这些属性也可以写在payload里。若写payload时分别使用exp, nbf, aud, sub, iss对应.但是不能同时在options和payload里出现。
 
-exp/nbf/iat必须是数值型的时间。
+<!-- exp/nbf/iat必须是数值型的时间。 -->
+expiresIn / notBefore 若是Number时，则被理解为秒。若是String，则需要使用时间单位（`days`,`hours`），否则使用ms为单位。
 
 options.header是自定义的。
 
@@ -65,7 +66,7 @@ exp字段应该是一个从纪元时间开始的一个数值。
         }, 'secret', {expiresIn: 60 * 60}) // 1h
     
     jwt.sign({data: 'foobar'}, 'secret', {expiresIn: '1h'}) // 1h
-### jwt.verify(payload, secretOrPublicKey, [options, cb])
+### jwt.verify(token, secretOrPublicKey, [options, cb])
 若有cb则异步回调函数。该函数的参数是err/token。
 若没有cd则同步返回jwt。
 secretOrPublicKey 是解码的公钥。可以是string / buffer / 包含HMAC 算法。
