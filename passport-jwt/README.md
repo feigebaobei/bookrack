@@ -7,30 +7,30 @@
 ### 配置策略
 
     let jwtStrategy = require('passport-jwt').Strategy,
-    	ExtractJwt = require('passport-jwt').ExtractJwt
+      ExtractJwt = require('passport-jwt').ExtractJwt
     let options = {
-    	jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken()
-    	secretOrKey = 'secret',
-    	issuer = 'accounts.examplesoft.com',
-    	audience = 'yoursite.net'
+      jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken()
+      secretOrKey = 'secret',
+      issuer = 'accounts.examplesoft.com',
+      audience = 'yoursite.net'
     }
     passport.use(new jwtStrategy(options, (jwt_payload, done) => {
-    	User.findOne({id: jwt_payload.sub}, (err, user) => {
-    		if (err) {return done(err, false)}
-    		if (user) {
-    			return done(null, user)
-    		} else {
-    			return done(null, false)
-    		}
-    	})
+      User.findOne({id: jwt_payload.sub}, (err, user) => {
+        if (err) {return done(err, false)}
+        if (user) {
+          return done(null, user)
+        } else {
+          return done(null, false)
+        }
+      })
     }))
 
 options是一个包含了如何从req中取出token/验证token的各个设置的对象.
 
 | property                | type     | describe                                                     | default        |
 | ----------------------- | -------- | ------------------------------------------------------------ | -------------- |
-|                         |          |                                                              |                |
-|                         |          |                                                              |                |
+| secretOrKey             |          |                                                              |                |
+| secretOrKeyProvider     |          |                                                              |                |
 | jwtFromRequest          | function | 接收req返回jwt / null。必选项。                              |                |
 | issuer                  |          | 若设置了issuer(iss)则验证。                                  |                |
 | audience                |          |                                                              |                |
@@ -63,11 +63,16 @@ passport-jwt.ExtractJwt有6个提取jwt的方法。它们都返回一个使用�
 
 ```
 var cookieExtractor = (req) => {
-	var token = null
-	if (req && req.cookies) {
-		token = req.cookies['jwt']
-	}
-	return token
+  var token = null
+  if (req && req.cookies) {
+    token = req.cookies['jwt']
+  }
+  return token
 }
 ```
 
+### 从req中取出jwt
+
+#### 编写自定义的提取方法
+
+### 在req中包含jwt

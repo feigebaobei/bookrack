@@ -36,7 +36,7 @@ db.once('open', () => {...})
 
 ```
 var kittySchema = new mongoose.Schema({name: String})
-var Kitten = mongoose.model('Kitten', kittySchema)
+var Kitten = mongoose.model('Kitten', kittySchema) // 把kittySchema编译为Kitten （model）
 ```
 
 ### 使用model
@@ -50,16 +50,20 @@ console.log(silence)
 
 ```
 kittySchema.methods.speak = () => {
-	console.log(name ? name : 'no name')
+	// console.log(name ? name : 'no name')
+	var greeting = this.name ? `Meow name is ${this.name}` : `i don't have a name`
+	console.log(greeting)
 }
 var Kitten = mongoose.model('Kitten', kittySchema)
 ```
+
+使用这种方法会的方法编译到model里。下面是使用方法的例子。
 
 ### 使用model的方法
 
 ```
 var fluffy = new Kitten({name: 'fluffy'})
-fluffy.speak()
+fluffy.speak() // 'Meow name is fluffy'
 ```
 
 ### 保存数据
