@@ -181,3 +181,25 @@ context选项可以把this指向当下的query对象。
     });
 
 ## Update Validators Only Run On Updated Paths
+
+```
+doc.updateOne({}, {$unset: {name: 1}}, {runValidators: true}, (err) => {
+	// ...
+	// err.errors[field]
+})
+```
+
+## Update Validators Only Run For Some Operations
+
+更新验证只会运行在下列的更新操作上。
+
+- $set
+- $unset 
+- $push(>=4.8.0)
+- $addToSet
+- $pull
+- $pullAll
+
+## On $push and $addToSet
+
+4.8.0时新增了2个验证器：`$push`、`$addToSet`
