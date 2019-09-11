@@ -124,8 +124,53 @@ schema.pre('remove', {query: true}, () => {console.log('removing query')})
 
 ## Notes on findAndUpdate() and Query Middleware
 
+save()的前后钩子都不会触发更新中间件（如update()/findOneAndUpdate()等）。
+查询中间件在文档中间件执行时this指向当前文档。
+查询中间件在查询中间件执行时this指向当前query对象。
+下面的例子在更新时添加了updatedAt字段。
+
+    schema.pre('update', function () {
+        this.update({}, {$set: {updatedAt: new Date()}})
+    })
 
 ## Error Handling Middleware
 
+当中间件执行到第一个`next(error)`时中止执行。有一种方法可以处理错误——错误中间件。错误中间件的方法接收三个参数，分别是当前错误error,当前文档doc,下一个中间件next.
+
+    schema.post('save', function (error, doc, next) { // 在文档中使用错误中间件
+        if (condition) {
+            next(new Error('message'))
+        } else {
+            next()
+        }
+    })
+    
+    doc.create(value, function (error) { // 在查询中间件中使用要错误中间件
+        doc.update({name: 'value'}, {$set: {name: 'other'}}, function (error) {
+            ...
+        })
+    })
+
 ## Aggregation Hooks
+
+    schema.pre('aggregate', function () {
+        this.pipeline().unshift({$match: {isDeleted: {$ne: true}}})
+    })
+
 ## Synchronous Hooks
+
+同步钩子方法不支持返回promise对象不支持接收next()方法.现在mongoose只有一个同步钩子方法`init()`
+
+    const schema = new Schema({ title: String, loadedAt: Date });
+    schema.pre('init', pojo => {
+      assert.equal(pojo.constructor.name, 'Object'); // Plain object before init
+    });
+    const now = new Date();
+    schema.post('init', doc => {
+      assert.ok(doc instanceof mongoose.Document); // Mongoose doc after init
+      doc.loadedAt = now;
+    });
+    const Test = db.model('TestPostInitMiddleware', schema);
+    return Test.create({ title: 'Casino Royale' }).
+      then(doc => Test.findById(doc)).
+      then(doc => assert.equal(doc.loadedAt.valueOf(), now.valueOf()));
