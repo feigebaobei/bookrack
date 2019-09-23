@@ -122,10 +122,9 @@ schema.pre('remove', {document: true}, () => {console.log('removing doc')})
 schema.pre('remove', {query: true}, () => {console.log('removing query')})
 ```
 
+
+
 ## Notes on findAndUpdate() and Query Middleware
-
-
 ## Error Handling Middleware
-
 ## Aggregation Hooks
 ## Synchronous Hooks
