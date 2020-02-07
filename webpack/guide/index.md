@@ -30,11 +30,11 @@ npm i lodash
 ```
 
 ```
-// dist/index.js
+// src/index.js
 import _ from 'lodash'
 function component() {
 	const element= document.createElement('div')
-	element.innnerHTML = _.json(['Hello', 'webpack'], ' ')
+	element.innerHTML = _.json(['Hello', 'webpack'], ' ')
 	return element
 }
 document.body.appendChild(component())
