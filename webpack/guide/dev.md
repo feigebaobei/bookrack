@@ -2,7 +2,7 @@
 
 ## 跟踪bug位置
 
-在前面的要例子中若出现了bug也不知道是哪个源文件第几行出现的问题。下面就学习如何解决这个问题。下面的代码是基于guide/output里的例子的代码的。
+在前面的例子中若出现了bug也不知道是哪个源文件第几行出现的问题。下面就学习如何解决这个问题。下面的代码是基于guide/output里的例子的代码的。
 
 在打包配置文件里设置devtool、mode.
 
@@ -32,7 +32,7 @@ devtool只能在开发环境工作。（mode: 'development'）
 
 ## 选择合适的开发工具
 
-现在我们每次打包都需要执行`npm run build` 或`webpack`。希望出现一种自动打包的aahw.下面3个这样的工具。
+现在我们每次打包都需要执行`npm run build` 或`webpack`。希望出现一种自动打包的工具。下面有3个这样的工具。
 
 1. 为webpack设置watch模式
 2. webpack-dev-server
